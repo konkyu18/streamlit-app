@@ -84,7 +84,7 @@ st.caption(f"学生の有業率: {work_rate:.1f}%")
 st.progress(min(int(work_rate), 100))
 
 st.divider()
-
+#UI3
 tab1, tab2, tab3 = st.tabs([" 学校別内訳", " 3都県を比較", "データダウンロード"])
 
 with tab1:
@@ -126,4 +126,30 @@ with tab2:
     ].copy()
     
     df_compare['有業率'] = df_compare.apply(lambda row: (row['有業者'] / row['総数'] * 100) if row['総数'] > 0 else 0, axis=1)
+
+    fig_comp = px.bar(
+        df_compare, 
+        x='地域', 
+        y='有業率', 
+        color='地域',
+        title=f'{compare_school}の有業率比較',
+        text_auto='.1f'
+    )
+    st.plotly_chart(fig_comp, use_container_width=True)
     
+    st.info("地域によって学生の働く割合にどのような差があるか確認してみましょう。")
+
+with tab3:
+    st.subheader("データ一覧")
+    #UI4
+    with st.expander("詳細データを見る"):
+        if 'df_schools' in locals():
+            st.dataframe(df_schools[['学校種別', '総数', '有業者', '有業率']])
+    #UI5
+    csv = df_student_total.to_csv(index=False).encode('shift-jis')
+    st.download_button(
+        label="表示中のデータをダウンロード",
+        data=csv,
+        file_name=f'student_data_{selected_pref}.csv',
+        mime='text/csv',
+    )
