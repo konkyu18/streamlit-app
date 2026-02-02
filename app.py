@@ -5,11 +5,10 @@ import plotly.express as px
 #UI1 ページ設定
 st.set_page_config(
     page_title="3都県 学生就業データ分析", 
-    page_icon="📚",
     layout="wide"
 )
 
-st.title("📚 在学中の学生の就業状況")
+st.title("在学中の学生の就業状況")
 st.markdown("""本アプリではe-Stat「就業状態等基本集計」のデータより、**在学中の学生**の就業状況を可視化します。  
 **東京都・長野県・静岡県**の学生の就業状況を比較・分析します。""")
 
@@ -73,10 +72,10 @@ working_students = df_student_total['有業者'].values[0]
 job_seeking_students = df_student_total['求職者'].values[0]
 work_rate = (working_students / total_students * 100) if total_students > 0 else 0
 
-st.markdown(f"### 📈 {selected_pref}の学生データ ハイライト")
+st.markdown(f"### {selected_pref}の学生データ ハイライト")
 col1, col2, col3 = st.columns(3)
 #UI2 メトリクス
-col1.metric("在学者数 (15歳以上)", f"{total_students:,}人")
+col1.metric("在学者数", f"{total_students:,}人")
 col2.metric("働く学生数 (有業者)", f"{working_students:,}人", f"有業率 {work_rate:.1f}%")
 col3.metric("就活・求職中の学生", f"{job_seeking_students:,}人")
 
@@ -104,7 +103,6 @@ with tab1:
             y='有業率', 
             color='学校種別',
             title='学校種別ごとの有業率（％）',
-            text_auto='.1f'
         )
         fig_school.update_layout(showlegend=False)
         st.plotly_chart(fig_school, use_container_width=True)
@@ -137,7 +135,7 @@ with tab2:
     )
     st.plotly_chart(fig_comp, use_container_width=True)
     
-    st.info("地域によって学生の働く割合にどのような差があるか確認してみましょう。")
+    st.info("地域によって働く学生をわかりやすくグラフで視覚化してみました")
 
 with tab3:
     st.subheader("データ一覧")
