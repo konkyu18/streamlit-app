@@ -84,7 +84,7 @@ st.progress(min(int(work_rate), 100))
 
 st.divider()
 #UI3
-tab1, tab2, tab3 = st.tabs([" 学校別内訳", " 3都県を比較", "データダウンロード"])
+tab1, tab2, tab3 = st.tabs([" 学校別内訳", " 3都県を比較", "データの詳細とダウンロード"])
 
 with tab1:
     st.subheader(f"{selected_pref} の学校種別 就業状況")
