@@ -84,3 +84,46 @@ st.caption(f"学生の有業率: {work_rate:.1f}%")
 st.progress(min(int(work_rate), 100))
 
 st.divider()
+
+tab1, tab2, tab3 = st.tabs([" 学校別内訳", " 3都県を比較", "データダウンロード"])
+
+with tab1:
+    st.subheader(f"{selected_pref} の学校種別 就業状況")
+     #抽出   
+    df_schools = df_filtered[
+        df_filtered['教育'].str.contains('（在学者）')
+    ].copy()
+    
+    if not df_schools.empty:
+        df_schools['学校種別'] = df_schools['教育'].apply(lambda x: x.replace('（在学者）', ''))
+        df_schools['有業率'] = df_schools.apply(lambda row: (row['有業者'] / row['総数'] * 100) if row['総数'] > 0 else 0, axis=1)
+        
+        fig_school = px.bar(
+            df_schools, 
+            x='学校種別', 
+            y='有業率', 
+            color='学校種別',
+            title='学校種別ごとの有業率（％）',
+            text_auto='.1f'
+        )
+        fig_school.update_layout(showlegend=False)
+        st.plotly_chart(fig_school, use_container_width=True)
+
+with tab2:
+    st.subheader("東京都・長野県・静岡県の比較")
+    
+    compare_school = st.selectbox(
+        "比較する学校種別", 
+        ["在学者", "大学（在学者）", "高校（在学者）"],
+        index=0
+    )
+#比較
+    df_compare = df[
+        (df['地域'].isin(target_prefs)) &   # ここで3つに絞る
+        (df['男女'] == '総数') & 
+        (df['年齢'] == '総数') & 
+        (df['教育'] == compare_school)
+    ].copy()
+    
+    df_compare['有業率'] = df_compare.apply(lambda row: (row['有業者'] / row['総数'] * 100) if row['総数'] > 0 else 0, axis=1)
+    
