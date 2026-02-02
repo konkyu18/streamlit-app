@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# ページ設定
+#UI1 ページ設定
 st.set_page_config(
     page_title="3都県 学生就業データ分析", 
     page_icon="📚",
@@ -32,7 +32,7 @@ def load_data():
         except:
             return 0
 
-    num_cols = ['総数', '働いている人', '無業者', '求職者']
+    num_cols = ['総数', '有業者', '無業者', '求職者']
     for col in num_cols:
         clean_df[col] = clean_df[col].astype(str).apply(to_int)
 #
@@ -48,7 +48,7 @@ except Exception as e:
     st.error(f"データ読み込みエラー: {e}")
     st.stop()
 #サイドバーの機能
-st.sidebar.header("🔍 分析条件")
+st.sidebar.header("条件指定")
 target_prefs = ['東京都', '長野県', '静岡県']
 
 selected_pref = st.sidebar.selectbox("地域を選択", target_prefs, index=0)
@@ -61,3 +61,26 @@ df_filtered = df[
     (df['男女'] == selected_gender) &
     (df['年齢'] == '総数')
 ]
+
+df_student_total = df_filtered[df_filtered['教育'] == '在学者']
+
+if df_student_total.empty:
+    st.warning("データが見つかりません")
+    st.stop()
+
+total_students = df_student_total['総数'].values[0]
+working_students = df_student_total['有業者'].values[0]
+job_seeking_students = df_student_total['求職者'].values[0]
+work_rate = (working_students / total_students * 100) if total_students > 0 else 0
+
+st.markdown(f"### 📈 {selected_pref}の学生データ ハイライト")
+col1, col2, col3 = st.columns(3)
+#UI2 メトリクス
+col1.metric("在学者数 (15歳以上)", f"{total_students:,}人")
+col2.metric("働く学生数 (有業者)", f"{working_students:,}人", f"有業率 {work_rate:.1f}%")
+col3.metric("就活・求職中の学生", f"{job_seeking_students:,}人")
+
+st.caption(f"学生の有業率: {work_rate:.1f}%")
+st.progress(min(int(work_rate), 100))
+
+st.divider()
